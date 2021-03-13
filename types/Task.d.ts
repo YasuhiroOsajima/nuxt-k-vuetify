@@ -1,6 +1,6 @@
 export default interface Task {
-  id: number
-  category_id: number
+  id: string
+  category_id: string
   name: string
   start_date: string
   end_date: string

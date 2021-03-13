@@ -1,8 +1,8 @@
 export default {
   tasks: [
     {
-      id: 1,
-      category_id: 1,
+      id: '24c4cc86-79d3-4a29-9607-349991631161',
+      category_id: '365da8de-572c-4a7b-844c-facacc0666311',
       name: 'テスト1',
       start_date: '2020-12-18',
       end_date: '2020-12-20',
@@ -10,8 +10,8 @@ export default {
       percentage: 100,
     },
     {
-      id: 2,
-      category_id: 1,
+      id: '24c4cc86-79d3-4a29-9607-349991631162',
+      category_id: '365da8de-572c-4a7b-844c-facacc0666311',
       name: 'テスト2',
       start_date: '2020-12-19',
       end_date: '2020-12-23',
@@ -19,8 +19,8 @@ export default {
       percentage: 90,
     },
     {
-      id: 3,
-      category_id: 3,
+      id: '24c4cc86-79d3-4a29-9607-349991631163',
+      category_id: '365da8de-572c-4a7b-844c-facacc0666313',
       name: 'テスト3',
       start_date: '2020-12-19',
       end_date: '2020-12-21',
@@ -28,8 +28,8 @@ export default {
       percentage: 40,
     },
     {
-      id: 4,
-      category_id: 2,
+      id: '24c4cc86-79d3-4a29-9607-349991631164',
+      category_id: '365da8de-572c-4a7b-844c-facacc0666312',
       name: 'テスト4',
       start_date: '2020-12-21',
       end_date: '2020-12-30',
@@ -37,8 +37,8 @@ export default {
       percentage: 60,
     },
     {
-      id: 5,
-      category_id: 2,
+      id: '24c4cc86-79d3-4a29-9607-349991631165',
+      category_id: '365da8de-572c-4a7b-844c-facacc0666312',
       name: 'テスト5',
       start_date: '2020-12-20',
       end_date: '2020-12-22',
@@ -46,8 +46,8 @@ export default {
       percentage: 5,
     },
     {
-      id: 6,
-      category_id: 1,
+      id: '24c4cc86-79d3-4a29-9607-349991631166',
+      category_id: '365da8de-572c-4a7b-844c-facacc0666311',
       name: 'テスト6',
       start_date: '2020-12-28',
       end_date: '2020-12-08',

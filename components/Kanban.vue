@@ -101,7 +101,7 @@
             depressed
             color="green accent-4"
             class="px-4 py-2 white--text mr-2 font-weight-bold"
-            @click="categoryAdd"
+            @click="taskUpdate"
           >
             更新
           </v-btn>
@@ -117,10 +117,20 @@
 import Vue from 'vue'
 import CategoryNameUpdate from '~/components/CategoryNameUpdate.vue'
 import TaskAdd from '~/components/TaskAdd.vue'
-import categories from '~/dataprovider/categories'
+import categoriesProvider from '~/dataprovider/categories'
+import tasksProvider from '~/dataprovider/tasks'
+import Category from '~/types/Category'
+import Task from '~/types/Task'
+import { v4 as uuidv4 } from 'uuid'
 import draggable from 'vuedraggable'
 
-export default Vue.extend({
+interface CategoryDisplay {
+  id: string
+  name: string
+  tasks: Task[]
+}
+
+const KanbanComponent = Vue.extend({
   components: {
     CategoryNameUpdate,
     TaskAdd,
@@ -128,183 +138,157 @@ export default Vue.extend({
   },
   data() {
     return {
-      task:'',
-      category:'',
-      type:'',
-      category_name:'',
+      task: {} as Task,
+      category: {} as Category,
+      type: '',
+      category_name: '',
       show_category_input: false,
-      modal:false,
-      categories: [
-        {
-          id: 1,
-          name: 'テストA',
-          collapsed: false,
-        },
-        {
-          id: 2,
-          name: 'テストB',
-          collapsed: false,
-        },
-        {
-          id: 3,
-          name: 'テストC',
-          collapsed: false,
-        },
-      ],
-      tasks: [
-        {
-          id: 1,
-          category_id: 1,
-          name: 'テスト1',
-          start_date: '2020-12-18',
-          end_date: '2020-12-20',
-          incharge_user: '鈴木',
-          percentage: 100,
-        },
-        {
-          id: 2,
-          category_id: 1,
-          name: 'テスト2',
-          start_date: '2020-12-19',
-          end_date: '2020-12-23',
-          incharge_user: '佐藤',
-          percentage: 90,
-        },
-        {
-          id: 3,
-          category_id: 3,
-          name: 'テスト3',
-          start_date: '2020-12-19',
-          end_date: '2020-12-21',
-          incharge_user: '鈴木',
-          percentage: 40,
-        },
-        {
-          id: 4,
-          category_id: 2,
-          name: 'テスト4',
-          start_date: '2020-12-21',
-          end_date: '2020-12-30',
-          incharge_user: '山下',
-          percentage: 60,
-        },
-        {
-          id: 5,
-          category_id: 2,
-          name: 'テスト5',
-          start_date: '2020-12-20',
-          end_date: '2020-12-22',
-          incharge_user: '佐藤',
-          percentage: 5,
-        },
-        {
-          id: 6,
-          category_id: 1,
-          name: 'テスト6',
-          start_date: '2020-12-28',
-          end_date: '2020-12-08',
-          incharge_user: '佐藤',
-          percentage: 0,
-        },
-      ],
-      form:{
-        id:'',
-        category_id:'',
-        name:'',
-        start_date:'',
-        end_date:'',
-        incharge_user:'',
-        percentage:''
+      modal: false,
+      categories: [] as Category[],
+      tasks: [] as Task[],
+      form: {
+        id: '',
+        category_id: '',
+        name: '',
+        start_date: '',
+        end_date: '',
+        incharge_user: '',
+        percentage: '',
       },
     }
   },
+  created() {
+    this.categories = categoriesProvider.categories
+    this.tasks = tasksProvider.tasks
+  },
   computed: {
     displayCategories() {
-      let categories = []
-      let tasks = ''
+      let categories: CategoryDisplay[] = []
+      let tasks: Task[] = []
       this.categories.map((category) => {
         tasks = this.tasks.filter((task) => task.category_id === category.id)
         categories.push({
           id: category.id,
           name: category.name,
-          tasks,
+          tasks: tasks,
         })
       })
       return categories
     },
   },
-  methods:{
-    dragTask(task){
-      this.task = task;
-      this.type = "task";
+  methods: {
+    dragTask(task: Task) {
+      this.task = task
+      this.type = 'task'
     },
-    dragCategory(category){
-      this.category = category;
-      this.type = "category";
+    dragCategory(category: Category) {
+      this.category = category
+      this.type = 'category'
     },
-    dragOverTask(overTask){
+    dragOverTask(overTask: Task) {
       if (overTask.id !== this.task.id && this.type === 'task') {
-        let deleteIndex;
-        let addIndex;
-        this.tasks.map((task, index) => { if (task.id === this.task.id) deleteIndex = index })
-        this.tasks.map((task, index) => { if (task.id === overTask.id) addIndex = index })
-        this.tasks.splice(deleteIndex, 1)
-        this.tasks.splice(addIndex, 0, this.task)
-        this.task.category_id = overTask.category_id
+        let deleteIndex
+        let addIndex
+
+        this.tasks.map((task, index) => {
+          if (task.id === this.task.id) {
+            deleteIndex = index
+          }
+        })
+
+        this.tasks.map((task, index) => {
+          if (task.id === overTask.id) {
+            addIndex = index
+          }
+        })
+
+        if (deleteIndex != null && addIndex != null) {
+          this.tasks.splice(deleteIndex, 1)
+          this.tasks.splice(addIndex, 0, this.task)
+          this.task.category_id = overTask.category_id
+        }
       }
     },
-    dragOverCategory(overCategory) {
-      if (overCategory.id !== this.category.id && this.type === "category") {
-        let deleteIndex;
-        let addIndex;
-        this.categories.map((category, index) => { if (category.id === this.category.id) deleteIndex = index })
-        this.categories.map((category, index) => { if (category.id === overCategory.id) addIndex = index })
-        this.categories.splice(deleteIndex, 1)
-        this.categories.splice(addIndex, 0, this.category)
-      } else if (this.task.category_id !== overCategory.id && this.type === "task") {
+    dragOverCategory(overCategory: Category) {
+      if (overCategory.id !== this.category.id && this.type === 'category') {
+        let deleteIndex
+        let addIndex
+
+        this.categories.map((category, index) => {
+          if (category.id === this.category.id) {
+            deleteIndex = index
+          }
+        })
+
+        this.categories.map((category, index) => {
+          if (category.id === overCategory.id) {
+            addIndex = index
+          }
+        })
+
+        if (deleteIndex != null && addIndex != null) {
+          this.categories.splice(deleteIndex, 1)
+          this.categories.splice(addIndex, 0, this.category)
+        }
+      } else if (
+        this.task.category_id !== overCategory.id &&
+        this.type === 'task'
+      ) {
         // Drag a task to empty category, there is no overTask.
         // So this.task has to get category_id by overCategory.
-        let tasks = this.tasks.filter(task => task.category_id === overCategory.id)
-        if (tasks.length === 0) this.task.category_id = overCategory.id;
+        let tasks = this.tasks.filter(
+          (task) => task.category_id === overCategory.id
+        )
+        if (tasks.length === 0) this.task.category_id = overCategory.id
       }
     },
     categoryAdd() {
       if (this.category_name != '') {
         this.categories.push({
-          id: Date.now(),
-          name: this.category_name
-        }),
-        this.show_category_input = false;
+          id: uuidv4(),
+          name: this.category_name,
+          collapsed: false,
+        })
+        this.show_category_input = false
       }
     },
     closeCategoryInput() {
-      this.category_name = '';
-      this.show_category_input = false;
+      this.category_name = ''
+      this.show_category_input = false
     },
-    categoryNameUpdate(category_name, category_id) {
-      let update_category = this.categories.find(cat => cat.id === category_id)
-      update_category.name = category_name
+    categoryNameUpdate(category_name: string, category_id: string) {
+      let update_category = this.categories.find(
+        (cat) => cat.id === category_id
+      )
+      if (update_category != null) {
+        update_category.name = category_name
+      }
     },
-    addTask(task_name, category_id) {
+    addTask(task_name: string, category_id: string) {
       this.tasks.push({
-        id: Date.now(),
-        category_id,
-        name: task_name
+        id: uuidv4(),
+        category_id: category_id,
+        name: task_name,
+        start_date: '',
+        end_date: '',
+        incharge_user: '',
+        percentage: 0,
       })
     },
-    openModal(category, task) {
-      this.category = category;
-      Object.assign(this.form, task);
-      this.modal = true;
+    openModal(category: Category, task: Task) {
+      this.category = category
+      Object.assign(this.form, task)
+      this.modal = true
     },
     taskUpdate() {
-      let task = this.tasks.find(task => task.id === this.form.id)
+      let task = this.tasks.find((task) => task.id === this.form.id)
       Object.assign(task, this.form)
-      this.modal = false;
-    }
+      this.modal = false
+    },
   },
-}
-)
+})
+
+export default KanbanComponent
 </script>
 
 <style>
