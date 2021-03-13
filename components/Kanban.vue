@@ -113,10 +113,11 @@
   </div>
 </template>
 
-<script lang="js">
+<script lang="ts">
 import Vue from 'vue'
-import CategoryNameUpdate from '~/components/CategoryNameUpdate'
-import TaskAdd from '~/components/TaskAdd'
+import CategoryNameUpdate from '~/components/CategoryNameUpdate.vue'
+import TaskAdd from '~/components/TaskAdd.vue'
+import categories from '~/dataprovider/categories'
 import draggable from 'vuedraggable'
 
 export default Vue.extend({

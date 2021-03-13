@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class=" my-3 mx-2 rounded-lg" v-if="!show" @click="showInput">
+    <div class="my-3 mx-2 rounded-lg" v-if="!show" @click="showInput">
       <span>タスクを追加</span>
     </div>
     <div class="mx-2" v-else>
@@ -36,35 +36,36 @@
   </div>
 </template>
 
-<script lang="js">
+<script lang="ts">
 import Vue from 'vue'
+
 export default Vue.extend({
   props: ['category_id'],
   data() {
     return {
       show: false,
-      task_name:'',
+      task_name: '',
     }
   },
   methods: {
     focusInput() {
-      this.$refs.input.focus();
+      ;(this.$refs.input as HTMLInputElement).focus()
     },
     showInput() {
-      this.show = true;
+      this.show = true
       Vue.nextTick(() => {
-        this.focusInput();
-      });
+        this.focusInput()
+      })
     },
     closeInput() {
-      this.show = false;
-      this.task_name = '';
+      this.show = false
+      this.task_name = ''
     },
     addTask() {
       if (this.task_name != '') {
         this.$emit('task-added', this.task_name, this.category_id)
-        this.show = false;
-        this.task_name = '';
+        this.show = false
+        this.task_name = ''
       }
     },
   },
