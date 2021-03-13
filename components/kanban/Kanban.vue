@@ -115,8 +115,8 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import CategoryNameUpdate from '~/components/CategoryNameUpdate.vue'
-import TaskAdd from '~/components/TaskAdd.vue'
+import CategoryNameUpdate from '~/components/kanban/CategoryNameUpdate.vue'
+import TaskAdd from '~/components/kanban/TaskAdd.vue'
 import categoriesProvider from '~/dataprovider/categories'
 import tasksProvider from '~/dataprovider/tasks'
 import Category from '~/types/Category'
@@ -129,7 +129,7 @@ interface CategoryDisplay {
   tasks: Task[]
 }
 
-const KanbanComponent = Vue.extend({
+export default Vue.extend({
   components: {
     CategoryNameUpdate,
     TaskAdd,
@@ -285,8 +285,6 @@ const KanbanComponent = Vue.extend({
     },
   },
 })
-
-export default KanbanComponent
 </script>
 
 <style>
