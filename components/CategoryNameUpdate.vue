@@ -12,38 +12,34 @@
   </div>
 </template>
 
-<script lang="js">
+<script lang="ts">
 import Vue from 'vue'
+
 export default Vue.extend({
   props: ['category'],
-  data(){
+  data() {
     return {
-      show:false,
-      category_name:'',
+      show: false,
+      category_name: '',
     }
   },
-  methods:{
-    showInput(){
+  methods: {
+    showInput() {
       this.category_name = this.category.name
-      this.show = true;
+      this.show = true
       Vue.nextTick(() => {
-        this.focusInput();
-      });
+        this.focusInput()
+      })
     },
     focusInput() {
-      this.$refs.input.focus();
+      ;(this.$refs.input as HTMLInputElement).focus()
     },
-    updateName(){
-      this.show = false;
+    updateName() {
+      this.show = false
       this.$emit('category-name-updated', this.category_name, this.category.id)
     },
-    openModal(category, task) {
-      this.category = category;
-      Object.assign(this.form, task);
-      this.modal = true;
-    },
   },
- })
+})
 </script>
 
 <style></style>
