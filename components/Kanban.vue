@@ -122,7 +122,6 @@ import tasksProvider from '~/dataprovider/tasks'
 import Category from '~/types/Category'
 import Task from '~/types/Task'
 import { v4 as uuidv4 } from 'uuid'
-import draggable from 'vuedraggable'
 
 interface CategoryDisplay {
   id: string
@@ -134,7 +133,6 @@ const KanbanComponent = Vue.extend({
   components: {
     CategoryNameUpdate,
     TaskAdd,
-    draggable,
   },
   data() {
     return {

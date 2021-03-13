@@ -8,9 +8,9 @@
   </v-app>
 </template>
 
-<script lang="js">
+<script lang="ts">
 import Vue from 'vue'
-import Kanban from '~/components/Kanban'
+import Kanban from '~/components/Kanban.vue'
 
 export default Vue.extend({
   components: {
