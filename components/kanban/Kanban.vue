@@ -1,6 +1,7 @@
 <template>
   <div>
-    <div class="mt-2">
+    <div>
+      <div class="my-1 text-h6">{{ user }}</div>
       <v-btn
         depressed
         color="light-blue darken-4"
@@ -149,6 +150,7 @@ export default Vue.extend({
   },
   data() {
     return {
+      user: '佐藤',
       task: {} as Task,
       category: {} as Category,
       type: '',

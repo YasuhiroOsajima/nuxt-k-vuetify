@@ -1,45 +1,32 @@
 <template>
-  <v-app>
-    <div class="text-h7 ma-2">Kanban sample</div>
+  <v-app class="overflow-x-auto mb-2">
+    <v-container fluid>
+      <div class="text-h6">チームミーティングアプリ</div>
+      <v-row class="mb-2">
+        <v-col>
+          <v-card flat>
+            <v-card-title> 【共有事項】 </v-card-title>
 
-    <v-main class="overflow-x-auto">
-      <v-container fluid>
-        <v-row class="mb-2">
-          <v-col>
-            <v-card flat>
-              <v-card-title> 共有事項 </v-card-title>
+            <div class="pl-2" style="max-width: 90%">
+              <Editor :rows="1"></Editor>
+            </div>
+          </v-card>
+        </v-col>
+      </v-row>
 
-              <div class="pl-2" style="max-width: 90%">
-                <Editor :rows="1"></Editor>
-              </div>
-            </v-card>
-          </v-col>
-        </v-row>
+      <v-divider></v-divider>
 
-        <v-divider></v-divider>
-
-        <v-row>
-          <v-col>
-            <v-card flat>
-              <v-card-title> チームタスク </v-card-title>
-              <div class="ml-2">
-                <Kanban></Kanban>
-              </div>
-            </v-card>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col>
-            <v-card flat>
-              <v-card-title> メンバータスク </v-card-title>
-              <div class="ml-2">
-                <Kanban></Kanban>
-              </div>
-            </v-card>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-main>
+      <v-row>
+        <v-col>
+          <v-card flat>
+            <v-card-title> 【タスク】 </v-card-title>
+            <div class="ml-2">
+              <Kanban></Kanban>
+            </div>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
   </v-app>
 </template>
 
