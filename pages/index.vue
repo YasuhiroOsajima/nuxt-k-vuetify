@@ -20,6 +20,7 @@
         <v-col>
           <v-card flat>
             <v-card-title> 【タスク】 </v-card-title>
+            <KanbanAdd @user-added="addKanban" class="mb-4 ml-2"></KanbanAdd>
             <div
               class="ml-2"
               v-for="(kanban, index) in kanban_list"
@@ -27,10 +28,12 @@
               style="min-width: 400px"
             >
               <Kanban
-              class="mb-4"
+                class="mb-4"
+                :id="kanban.id"
                 :user="kanban.user"
                 :categoriesData="kanban.categories"
                 :tasksData="kanban.tasks"
+                @kanban-deleted="deleteKanban"
               ></Kanban>
             </div>
           </v-card>
@@ -44,6 +47,7 @@
 import Vue from 'vue'
 import Kanban from '~/components/kanban/Kanban.vue'
 import Editor from '~/components/editor/Editor.vue'
+import KanbanAdd from '~/components/kanban/KanbanAdd.vue'
 import KanbanType from '~/types/Kanban'
 import kanbanProvider from '~/dataprovider/kanban'
 
@@ -51,6 +55,7 @@ export default Vue.extend({
   components: {
     Kanban,
     Editor,
+    KanbanAdd,
   },
   data() {
     return {
@@ -59,6 +64,29 @@ export default Vue.extend({
   },
   created() {
     this.kanban_list = kanbanProvider.kanban
+  },
+  methods: {
+    addKanban(user_id: string) {
+      // Todo. send REST API to get target User's kanban by user_id.
+      this.kanban_list.push({
+        id: user_id,
+        user: '田中',
+        categories: [],
+        tasks: [],
+      })
+    },
+    deleteKanban(user_id: string) {
+      let deleteIndex
+      this.kanban_list.map((kanban, index) => {
+        if (kanban.id === user_id) {
+          deleteIndex = index
+        }
+      })
+
+      if (deleteIndex != null) {
+        this.kanban_list.splice(deleteIndex, 1)
+      }
+    },
   },
 })
 </script>

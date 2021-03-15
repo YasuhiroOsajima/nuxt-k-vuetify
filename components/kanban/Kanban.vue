@@ -2,15 +2,24 @@
   <div>
     <div>
       <div class="my-1 text-h6">{{ user }}</div>
-      <v-btn
-        depressed
-        color="light-blue darken-4"
-        class="mb-1 white--text font-weight-bold"
-        v-if="!show_category_input"
-        @click="show_category_input = true"
-      >
-        カテゴリーを追加
-      </v-btn>
+      <div v-if="!show_category_input" class="mb-1">
+        <v-btn
+          depressed
+          color="light-blue darken-4"
+          class="white--text font-weight-bold"
+          @click="show_category_input = true"
+        >
+          カテゴリーを追加
+        </v-btn>
+        <v-btn
+          depressed
+          color="deep-purple lighten-1"
+          class="ml-1 white--text font-weight-bold"
+          @click="checkDeleteKanban"
+        >
+          カンバンを削除
+        </v-btn>
+      </div>
       <div v-else>
         <div class="mb-1">
           <v-text-field
@@ -104,22 +113,50 @@
         <v-card-text class="text-h6">
           {{ delete_category_name }} を削除しますか？
         </v-card-text>
-        <v-btn
-          depressed
-          color="deep-purple lighten-1"
-          class="px-4 py-2 white--text mr-2 font-weight-bold"
-          @click="deleteCategory"
-        >
-          削除
-        </v-btn>
-        <v-btn
-          depressed
-          color="red accent-2"
-          class="px-4 py-2 white--text mr-2 font-weight-bold"
-          @click="cancelDeleteCatedory"
-        >
-          キャンセル
-        </v-btn>
+        <div class="ml-4 mb-2">
+          <v-btn
+            depressed
+            color="deep-purple lighten-1"
+            class="px-4 py-2 white--text mr-2 font-weight-bold"
+            @click="deleteCategory"
+          >
+            削除
+          </v-btn>
+          <v-btn
+            depressed
+            color="red accent-2"
+            class="px-4 py-2 white--text mr-2 font-weight-bold"
+            @click="cancelDeleteCatedory"
+          >
+            キャンセル
+          </v-btn>
+        </div>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="check_kanban_modal" width="500">
+      <v-card class="mx-auto" outlined>
+        <v-card-text class="text-h6">
+          {{ user }} のカンバンを削除しますか？
+        </v-card-text>
+        <div class="ml-4 mb-2">
+          <v-btn
+            depressed
+            color="deep-purple lighten-1"
+            class="px-4 py-2 white--text mr-2 font-weight-bold"
+            @click="deleteKanban"
+          >
+            削除
+          </v-btn>
+          <v-btn
+            depressed
+            color="red accent-2"
+            class="px-4 py-2 white--text mr-2 font-weight-bold"
+            @click="cancelDeleteKanban"
+          >
+            キャンセル
+          </v-btn>
+        </div>
       </v-card>
     </v-dialog>
   </div>
@@ -147,6 +184,10 @@ export default Vue.extend({
     TaskModal,
   },
   props: {
+    id: {
+      type: String,
+      required: true,
+    },
     user: {
       type: String,
       required: true,
@@ -175,6 +216,7 @@ export default Vue.extend({
       check_category_modal: false,
       delete_category_id: '',
       delete_category_name: '',
+      check_kanban_modal: false,
     }
   },
   created() {
@@ -344,6 +386,17 @@ export default Vue.extend({
     },
     closeModal() {
       this.modal = false
+    },
+    checkDeleteKanban() {
+      this.check_kanban_modal = true
+    },
+    deleteKanban() {
+      // Todo. send REST API to delete kanban.
+      this.$emit('kanban-deleted', this.id)
+      this.check_kanban_modal = false
+    },
+    cancelDeleteKanban() {
+      this.check_kanban_modal = false
     },
   },
 })
