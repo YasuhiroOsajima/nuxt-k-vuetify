@@ -22,7 +22,7 @@
             depressed
             color="teal darken-3"
             class="px-4 py-2 white--text mr-2 font-weight-bold"
-            @click="categoryAdd"
+            @click="addCategory"
           >
             追加
           </v-btn>
@@ -53,7 +53,7 @@
           >
             <CategoryNameUpdate
               :category="category"
-              @category-name-updated="categoryNameUpdate"
+              @category-name-updated="updateCategoryName"
             >
             </CategoryNameUpdate>
 
@@ -69,7 +69,20 @@
               {{ task.name }}
             </div>
 
-            <TaskAdd @task-added="addTask" :category_id="category.id"></TaskAdd>
+            <v-row class="mt-2 mb-1">
+              <TaskAdd
+                @task-added="addTask"
+                :category_id="category.id"
+              ></TaskAdd>
+              <v-btn
+                depressed
+                color="deep-purple lighten-1"
+                class="ml-2 white--text font-weight-bold"
+                @click="checkDeleteCategory(category)"
+              >
+                カテゴリを削除
+              </v-btn>
+            </v-row>
           </div>
         </div>
       </div>
@@ -77,12 +90,36 @@
 
     <v-dialog v-model="modal" width="500">
       <TaskModal
-        @task-update="taskUpdate"
+        @task-update="updateTask"
         @close-modal="closeModal"
         @delete-task="deleteTask"
         :formTask="modal_form_task"
         :category_name="modal_category_name"
       ></TaskModal>
+    </v-dialog>
+
+    <v-dialog v-model="check_category_modal" width="500">
+      <v-card class="mx-auto" outlined>
+        <v-card-text class="text-h6">
+          {{ delete_category_name }} を削除しますか？
+        </v-card-text>
+        <v-btn
+          depressed
+          color="deep-purple lighten-1"
+          class="px-4 py-2 white--text mr-2 font-weight-bold"
+          @click="deleteCategory"
+        >
+          削除
+        </v-btn>
+        <v-btn
+          depressed
+          color="red accent-2"
+          class="px-4 py-2 white--text mr-2 font-weight-bold"
+          @click="cancelDeleteCatedory"
+        >
+          キャンセル
+        </v-btn>
+      </v-card>
     </v-dialog>
   </div>
 </template>
@@ -96,7 +133,7 @@ import categoriesProvider from '~/dataprovider/categories'
 import tasksProvider from '~/dataprovider/tasks'
 import Category from '~/types/Category'
 import Task from '~/types/Task'
-import { v4 as uuidv4 } from 'uuid'
+import { stringify, v4 as uuidv4 } from 'uuid'
 
 interface CategoryDisplay {
   id: string
@@ -122,6 +159,9 @@ export default Vue.extend({
       tasks: [] as Task[],
       modal_form_task: {} as Task,
       modal_category_name: '',
+      check_category_modal: false,
+      delete_category_id: '',
+      delete_category_name: '',
     }
   },
   created() {
@@ -209,7 +249,7 @@ export default Vue.extend({
         if (tasks.length === 0) this.task.category_id = overCategory.id
       }
     },
-    categoryAdd() {
+    addCategory() {
       if (this.category_name != '') {
         this.categories.push({
           id: uuidv4(),
@@ -219,11 +259,36 @@ export default Vue.extend({
         this.show_category_input = false
       }
     },
+    checkDeleteCategory(category: Category) {
+      this.check_category_modal = true
+      this.delete_category_id = category.id
+      this.delete_category_name = category.name
+    },
+    deleteCategory() {
+      let deleteIndex
+      this.categories.map((category, index) => {
+        if (category.id === this.delete_category_id) {
+          deleteIndex = index
+        }
+      })
+      if (deleteIndex != null) {
+        this.categories.splice(deleteIndex, 1)
+      }
+
+      this.check_category_modal = false
+      this.delete_category_id = ''
+      this.delete_category_name = ''
+    },
+    cancelDeleteCatedory() {
+      this.check_category_modal = false
+      this.delete_category_id = ''
+      this.delete_category_name = ''
+    },
     closeCategoryInput() {
       this.category_name = ''
       this.show_category_input = false
     },
-    categoryNameUpdate(category_name: string, category_id: string) {
+    updateCategoryName(category_name: string, category_id: string) {
       let update_category = this.categories.find(
         (cat) => cat.id === category_id
       )
@@ -254,7 +319,7 @@ export default Vue.extend({
       }
       this.modal = false
     },
-    taskUpdate(form: Task) {
+    updateTask(form: Task) {
       let task = this.tasks.find((task) => task.id === form.id)
       Object.assign(task, form)
       this.modal = false

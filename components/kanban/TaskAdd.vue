@@ -3,7 +3,7 @@
     <v-btn
       depressed
       color="light-blue darken-4"
-      class="ml-2 mb-1 white--text font-weight-bold"
+      class="ml-2 white--text font-weight-bold"
       v-if="!show"
       @click="showInput"
     >
