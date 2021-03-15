@@ -79,8 +79,9 @@
       <TaskModal
         @task-update="taskUpdate"
         @close-modal="closeModal"
-        :formTask="modalFormTask"
-        :category_name="modalCategoryName"
+        @delete-task="deleteTask"
+        :formTask="modal_form_task"
+        :category_name="modal_category_name"
       ></TaskModal>
     </v-dialog>
   </div>
@@ -119,8 +120,8 @@ export default Vue.extend({
       modal: false,
       categories: [] as Category[],
       tasks: [] as Task[],
-      modalFormTask: {} as Task,
-      modalCategoryName: '',
+      modal_form_task: {} as Task,
+      modal_category_name: '',
     }
   },
   created() {
@@ -241,14 +242,26 @@ export default Vue.extend({
         percentage: 0,
       })
     },
+    deleteTask(task_id: string) {
+      let deleteIndex
+      this.tasks.map((task, index) => {
+        if (task.id === task_id) {
+          deleteIndex = index
+        }
+      })
+      if (deleteIndex != null) {
+        this.tasks.splice(deleteIndex, 1)
+      }
+      this.modal = false
+    },
     taskUpdate(form: Task) {
       let task = this.tasks.find((task) => task.id === form.id)
       Object.assign(task, form)
       this.modal = false
     },
     openModal(task: Task, categoryName: string) {
-      this.modalFormTask = task
-      this.modalCategoryName = categoryName
+      this.modal_form_task = task
+      this.modal_category_name = categoryName
       this.modal = true
     },
     closeModal() {
