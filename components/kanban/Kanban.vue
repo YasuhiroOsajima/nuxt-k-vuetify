@@ -126,15 +126,13 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import Vue, { PropType } from 'vue'
 import CategoryNameUpdate from '~/components/kanban/CategoryNameUpdate.vue'
 import TaskAdd from '~/components/kanban/TaskAdd.vue'
 import TaskModal from '~/components/kanban/TaskModal.vue'
-import categoriesProvider from '~/dataprovider/categories'
-import tasksProvider from '~/dataprovider/tasks'
 import Category from '~/types/Category'
 import Task from '~/types/Task'
-import { stringify, v4 as uuidv4 } from 'uuid'
+import { v4 as uuidv4 } from 'uuid'
 
 interface CategoryDisplay {
   id: string
@@ -148,9 +146,22 @@ export default Vue.extend({
     TaskAdd,
     TaskModal,
   },
+  props: {
+    user: {
+      type: String,
+      required: true,
+    },
+    categoriesData: {
+      type: Array as PropType<Category[]>,
+      required: true,
+    },
+    tasksData: {
+      type: Array as PropType<Task[]>,
+      required: true,
+    },
+  },
   data() {
     return {
-      user: '佐藤',
       task: {} as Task,
       category: {} as Category,
       type: '',
@@ -167,8 +178,8 @@ export default Vue.extend({
     }
   },
   created() {
-    this.categories = categoriesProvider.categories
-    this.tasks = tasksProvider.tasks
+    this.categories = this.categoriesData
+    this.tasks = this.tasksData
   },
   computed: {
     displayCategories() {

@@ -20,8 +20,18 @@
         <v-col>
           <v-card flat>
             <v-card-title> 【タスク】 </v-card-title>
-            <div class="ml-2">
-              <Kanban></Kanban>
+            <div
+              class="ml-2"
+              v-for="(kanban, index) in kanban_list"
+              :key="index"
+              style="min-width: 400px"
+            >
+              <Kanban
+              class="mb-4"
+                :user="kanban.user"
+                :categoriesData="kanban.categories"
+                :tasksData="kanban.tasks"
+              ></Kanban>
             </div>
           </v-card>
         </v-col>
@@ -34,11 +44,21 @@
 import Vue from 'vue'
 import Kanban from '~/components/kanban/Kanban.vue'
 import Editor from '~/components/editor/Editor.vue'
+import KanbanType from '~/types/Kanban'
+import kanbanProvider from '~/dataprovider/kanban'
 
 export default Vue.extend({
   components: {
     Kanban,
     Editor,
+  },
+  data() {
+    return {
+      kanban_list: [] as KanbanType[],
+    }
+  },
+  created() {
+    this.kanban_list = kanbanProvider.kanban
   },
 })
 </script>
