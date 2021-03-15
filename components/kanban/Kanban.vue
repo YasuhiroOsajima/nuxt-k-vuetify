@@ -1,5 +1,43 @@
 <template>
   <div>
+    <div class="mt-2">
+      <v-btn
+        depressed
+        color="light-blue darken-4"
+        class="mb-1 white--text font-weight-bold"
+        v-if="!show_category_input"
+        @click="show_category_input = true"
+      >
+        カテゴリーを追加
+      </v-btn>
+      <div v-else>
+        <div class="mb-1">
+          <v-text-field
+            background-color="white"
+            label="新しいカテゴリー名を追加してください"
+            v-model="category_name"
+          >
+          </v-text-field>
+          <v-btn
+            depressed
+            color="teal darken-3"
+            class="px-4 py-2 white--text mr-2 font-weight-bold"
+            @click="categoryAdd"
+          >
+            追加
+          </v-btn>
+          <v-btn
+            depressed
+            color="red accent-2"
+            class="px-4 py-2 white--text mr-2 font-weight-bold"
+            @click="closeCategoryInput"
+          >
+            キャンセル
+          </v-btn>
+        </div>
+      </div>
+    </div>
+
     <v-layout>
       <div class="grey lighten-1 d-flex">
         <div
@@ -22,11 +60,11 @@
             <div
               v-for="(task, index) in category.tasks"
               :key="index"
-              class="grey lighten-5 ma-2 pa-2"
               @dragstart="dragTask(task)"
               @dragover.prevent="dragOverTask(task)"
               draggable="true"
-              @click="openModal(category, task)"
+              class="grey lighten-5 ma-2 pa-2"
+              @click="openModal(task, category.name)"
             >
               {{ task.name }}
             </div>
@@ -37,79 +75,14 @@
       </div>
     </v-layout>
 
-    <div class="grey lighten-3 mx-3 my-2 pa-2 text-sm-left">
-      <div v-if="!show_category_input" @click="show_category_input = true">
-        カテゴリーを追加
-      </div>
-      <div v-else>
-        <input
-          type="text"
-          class="pa-2 white"
-          placeholder="新しいカテゴリー名を追加してください"
-          v-model="category_name"
-          style="width: 100%"
-        />
-        <div class="ma-2">
-          <v-btn
-            depressed
-            color="green accent-4"
-            class="px-4 py-2 white--text mr-2 font-weight-bold"
-            @click="categoryAdd"
-          >
-            追加
-          </v-btn>
-          <v-btn
-            depressed
-            color="red accent-2"
-            class="px-4 py-2 white--text mr-2 font-weight-bold"
-            @click="closeCategoryInput"
-          >
-            キャンセル
-          </v-btn>
-        </div>
-      </div>
-    </div>
-
-    <portal to="modal">
-      <div class="base" v-show="modal">
-        <div class="overlay" v-show="modal" @click="modal = false"></div>
-        <div class="content" v-show="modal">
-          <div class="font-weight-bold">{{ form.name }}</div>
-          <div class="text-xs-left">in カテゴリー{{ this.category.name }}</div>
-          <div class="my-4">
-            <label class="text-xs-left"> 担当者 </label>
-            <input
-              class="rounded-lg px-4 py-2 text-xs"
-              v-model="form.incharge_user"
-            />
-          </div>
-          <div class="my-4">
-            <label class="text-xs"> 開始日 </label>
-            <input
-              class="rounded-lg px-4 py-2 text-xs"
-              v-model="form.start_date"
-            />
-          </div>
-          <div class="my-4">
-            <label class="text-xs"> 終了締切日 </label>
-            <input
-              class="rounded-lg px-4 py-2 text-xs"
-              v-model="form.end_date"
-            />
-          </div>
-          <v-btn
-            depressed
-            color="green accent-4"
-            class="px-4 py-2 white--text mr-2 font-weight-bold"
-            @click="taskUpdate"
-          >
-            更新
-          </v-btn>
-        </div>
-      </div>
-    </portal>
-
-    <portal-target name="modal"></portal-target>
+    <v-dialog v-model="modal" width="500">
+      <TaskModal
+        @task-update="taskUpdate"
+        @close-modal="closeModal"
+        :formTask="modalFormTask"
+        :category_name="modalCategoryName"
+      ></TaskModal>
+    </v-dialog>
   </div>
 </template>
 
@@ -117,6 +90,7 @@
 import Vue from 'vue'
 import CategoryNameUpdate from '~/components/kanban/CategoryNameUpdate.vue'
 import TaskAdd from '~/components/kanban/TaskAdd.vue'
+import TaskModal from '~/components/kanban/TaskModal.vue'
 import categoriesProvider from '~/dataprovider/categories'
 import tasksProvider from '~/dataprovider/tasks'
 import Category from '~/types/Category'
@@ -133,6 +107,7 @@ export default Vue.extend({
   components: {
     CategoryNameUpdate,
     TaskAdd,
+    TaskModal,
   },
   data() {
     return {
@@ -144,15 +119,8 @@ export default Vue.extend({
       modal: false,
       categories: [] as Category[],
       tasks: [] as Task[],
-      form: {
-        id: '',
-        category_id: '',
-        name: '',
-        start_date: '',
-        end_date: '',
-        incharge_user: '',
-        percentage: '',
-      },
+      modalFormTask: {} as Task,
+      modalCategoryName: '',
     }
   },
   created() {
@@ -273,43 +241,21 @@ export default Vue.extend({
         percentage: 0,
       })
     },
-    openModal(category: Category, task: Task) {
-      this.category = category
-      Object.assign(this.form, task)
+    taskUpdate(form: Task) {
+      let task = this.tasks.find((task) => task.id === form.id)
+      Object.assign(task, form)
+      this.modal = false
+    },
+    openModal(task: Task, categoryName: string) {
+      this.modalFormTask = task
+      this.modalCategoryName = categoryName
       this.modal = true
     },
-    taskUpdate() {
-      let task = this.tasks.find((task) => task.id === this.form.id)
-      Object.assign(task, this.form)
+    closeModal() {
       this.modal = false
     },
   },
 })
 </script>
 
-<style>
-.base {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  margin-top: 50px;
-}
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: gray;
-  opacity: 0.5;
-}
-.content {
-  background-color: white;
-  position: relative;
-  border-radius: 10px;
-  padding: 40px;
-}
-</style>
+<style></style>

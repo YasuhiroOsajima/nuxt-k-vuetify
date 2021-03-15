@@ -1,8 +1,14 @@
 <template>
   <div>
-    <div class="my-3 mx-2 rounded-lg" v-if="!show" @click="showInput">
-      <span>タスクを追加</span>
-    </div>
+    <v-btn
+      depressed
+      color="light-blue darken-4"
+      class="ml-2 mb-1 white--text font-weight-bold"
+      v-if="!show"
+      @click="showInput"
+    >
+      タスクを追加
+    </v-btn>
     <div class="mx-2" v-else>
       <div>
         <input
@@ -17,7 +23,7 @@
       <div class="ma-2">
         <v-btn
           depressed
-          color="green accent-4"
+          color="teal darken-3"
           class="px-4 py-2 white--text mr-2 font-weight-bold"
           @click="addTask"
         >
